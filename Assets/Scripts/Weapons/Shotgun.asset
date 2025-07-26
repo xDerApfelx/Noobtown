@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bc13ee3f832c14448ba76cd0c369a4d, type: 3}
+  m_Name: Shotgun
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponProfile
+  crosshairSprite: {fileID: 0}
+  baseSpread: 0.1
+  walkSpread: 0.15
+  hipSpread: 0.4
+  runSpread: 0.6
+  crouchSpread: 0.05
+  jumpSpread: 0.9
+  adsSpread: 0.02
+  isAutomatic: 0
+  fireRate: 4
+  pellets: 1
+  damage: 20
+  range: 100
+  magazineSize: 12
+  maxAmmo: 120
+  recoilKickback: 0.05
+  recoilRecovery: 10
+  isMelee: 0
+  meleeRange: 2
+  meleeDamage: 35
+  muzzleFlashPrefab: {fileID: 0}
+  shotSfx: {fileID: 0}
+  reloadSfx: {fileID: 0}
