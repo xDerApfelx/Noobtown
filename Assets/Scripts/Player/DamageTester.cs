@@ -26,6 +26,6 @@ public class DamageTester : MonoBehaviour
 
     void OnTestDamage(InputAction.CallbackContext context)
     {
-        playerHealth.TakeDamage(25);
+        playerHealth.TakeDamageServerRpc(25);
     }
 }

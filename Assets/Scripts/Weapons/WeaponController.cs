@@ -126,7 +126,7 @@ public class WeaponController : MonoBehaviour
                             p.range, hitMask, QueryTriggerInteraction.Ignore))
         {
             PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-            if (hp) hp.TakeDamage((int)p.damage);
+            if (hp) hp.TakeDamageServerRpc((int)p.damage);
         }
     }
 
@@ -139,7 +139,7 @@ public class WeaponController : MonoBehaviour
                             p.meleeRange, hitMask, QueryTriggerInteraction.Ignore))
         {
             PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-            if (hp) hp.TakeDamage((int)p.meleeDamage);
+            if (hp) hp.TakeDamageServerRpc((int)p.meleeDamage);
         }
     }
 
