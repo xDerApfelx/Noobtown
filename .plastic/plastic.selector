@@ -1,4 +1,3 @@
 repository "Noobtown/Noobtown@9071475377567@cloud"
   path "/"
-    br "/main"
-    co "/main"
+    smartbranch "/main" changeset "24"
