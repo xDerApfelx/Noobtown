@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;   // <– neues Input-System
+using Unity.Netcode;
 
 public class WeaponController : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class WeaponController : MonoBehaviour
     float nextShotTime;          // Cooldown‐Timer
     int currentAmmo;           // Restkugeln im Magazin
     public LayerMask hitMask;     // im Inspector setzen: alles außer „Player“
+    private PlayerHealth shooterHealth;
 
 
     void Awake()
@@ -48,6 +50,8 @@ public class WeaponController : MonoBehaviour
         }
         current = 0;
         ApplyProfile(profiles[current]);
+
+        shooterHealth = GetComponentInParent<PlayerHealth>();
 
         currentAmmo = profiles[current].magazineSize;
 
@@ -126,7 +130,10 @@ public class WeaponController : MonoBehaviour
                             p.range, hitMask, QueryTriggerInteraction.Ignore))
         {
             PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-            if (hp) hp.TakeDamage((int)p.damage);
+            if (hp)
+            {
+                hp.TakeDamageServerRpc((int)p.damage, (int)shooterHealth.team.Value);
+            }
         }
     }
 
@@ -139,7 +146,10 @@ public class WeaponController : MonoBehaviour
                             p.meleeRange, hitMask, QueryTriggerInteraction.Ignore))
         {
             PlayerHealth hp = hit.collider.GetComponent<PlayerHealth>();
-            if (hp) hp.TakeDamage((int)p.meleeDamage);
+            if (hp)
+            {
+                hp.TakeDamageServerRpc((int)p.meleeDamage, (int)shooterHealth.team.Value);
+            }
         }
     }
 
