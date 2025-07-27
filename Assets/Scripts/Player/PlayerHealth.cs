@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Unity.Netcode;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : NetworkBehaviour
 {
     public int maxHealth = 200;
-    private float currentHealth;
+    private NetworkVariable<float> currentHealth = new NetworkVariable<float>(
+        writePerm: NetworkVariableWritePermission.Server);
 
     public GameObject deathMessageUI; // UI-Canvas oder Text
     public Transform respawnPoint;    // Punkt zum Respawnen
@@ -23,26 +25,31 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        currentHealth = maxHealth;
-        deathMessageUI.SetActive(false);
+        if (IsServer)
+            currentHealth.Value = maxHealth;
+
+        if (IsOwner)
+            deathMessageUI.SetActive(false);
+
         currentRegenRate = regenRate;
 
 
     }
 
-    public int CurrentHealth => Mathf.RoundToInt(currentHealth);   // 2) Property wandelt fürs UI um
+    public int CurrentHealth => Mathf.RoundToInt(currentHealth.Value);   // 2) Property wandelt fürs UI um
     public int MaxHealth => maxHealth;
 
 
-    public void TakeDamage(int amount)
+    [ServerRpc(RequireOwnership = false)]
+    public void TakeDamageServerRpc(int amount)
     {
-        if (currentHealth <= 0) return;
+        if (currentHealth.Value <= 0) return;
 
         timeSinceLastDamage = 0f;   // ← reicht hier
 
-        currentHealth -= amount;
+        currentHealth.Value -= amount;
 
-        if (currentHealth <= 0)
+        if (currentHealth.Value <= 0)
         {
             Die();
         }
@@ -58,7 +65,8 @@ public class PlayerHealth : MonoBehaviour
         controller.enabled = false;
 
         // Meldung anzeigen
-        deathMessageUI.SetActive(true);
+        if (IsOwner)
+            deathMessageUI.SetActive(true);
 
         // Respawn einleiten
         StartCoroutine(RespawnAfterDelay(2f));
@@ -68,7 +76,7 @@ public class PlayerHealth : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        currentHealth = maxHealth;
+        currentHealth.Value = maxHealth;
         timeSinceLastDamage = 0f;
         timeInRegen = 0f;
         currentRegenRate = regenRate;
@@ -77,18 +85,19 @@ public class PlayerHealth : MonoBehaviour
         transform.position = respawnPoint.position;
         controller.enabled = true;
 
-        deathMessageUI.SetActive(false);
+        if (IsOwner)
+            deathMessageUI.SetActive(false);
     }
 
 
     void Update()
     {
-        if (currentHealth <= 0) return;            // tot
+        if (currentHealth.Value <= 0) return;            // tot
 
         timeSinceLastDamage += Time.deltaTime;
 
         // ► Regeneration aktiv?
-        if (currentHealth < maxHealth && timeSinceLastDamage >= regenDelay)
+        if (currentHealth.Value < maxHealth && timeSinceLastDamage >= regenDelay)
         {
             // 1) Timer für Ramp-Logik
             timeInRegen += Time.deltaTime;
@@ -101,8 +110,11 @@ public class PlayerHealth : MonoBehaviour
             }
 
             // 3) Heilen
-            currentHealth += currentRegenRate * Time.deltaTime;
-            currentHealth = Mathf.Min(currentHealth, maxHealth);
+            if (IsServer)
+            {
+                currentHealth.Value += currentRegenRate * Time.deltaTime;
+                currentHealth.Value = Mathf.Min(currentHealth.Value, maxHealth);
+            }
         }
     }
 
