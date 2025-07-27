@@ -25,15 +25,16 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Start()
     {
+        currentRegenRate = regenRate;
+    }
+
+    public override void OnNetworkSpawn()
+    {
         if (IsServer)
             currentHealth.Value = maxHealth;
 
         if (IsOwner)
             deathMessageUI.SetActive(false);
-
-        currentRegenRate = regenRate;
-
-
     }
 
     public int CurrentHealth => Mathf.RoundToInt(currentHealth.Value);   // 2) Property wandelt fürs UI um
